@@ -1,19 +1,20 @@
-const express = require('express')
+require('dotenv').config();
+const express = require('express');
 const cors = require('cors');
-require('dotenv').config()
-const app = express()
+const app = express();
 const {
     MongoClient,
     ServerApiVersion
 } = require('mongodb');
-const port = process.env.PORT || 5000
+
+const port = process.env.PORT || 5001
 
 
 
 
 app.use(cors());
 app.use(express.json());
-
+// app.use(axios())
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.cn0nmqv.mongodb.net/?retryWrites=true&w=majority`;
@@ -31,6 +32,29 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
+
+        const JobCollection = client.db('TalendBazaar').collection('JobItem');
+
+        // post data of add job info add on database
+        app.post('/addjob', async (req, res) => {
+            const jobData = req.body;
+            const result = await JobCollection.insertOne(jobData)
+            res.send(result)
+        })
+
+
+        // get posted data for showing in Brows by catagory
+        app.get('/jobcatagory', async (req, res) => {
+            // const options = {
+            //     projection: {
+                    
+            //     },
+            // };
+            const resuls = await JobCollection.find().toArray();
+            res.send(resuls)
+        })
+
+
 
 
         // Send a ping to confirm a successful connection
