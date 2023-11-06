@@ -34,6 +34,7 @@ async function run() {
         // await client.connect();
 
         const JobCollection = client.db('TalendBazaar').collection('JobItem');
+        const MyBidsCollection = client.db('TalendBazaar').collection('MyBids');
 
         // post data of add job info add on database
         app.post('/addjob', async (req, res) => {
@@ -41,18 +42,28 @@ async function run() {
             const result = await JobCollection.insertOne(jobData)
             res.send(result)
         })
-
+        // post data which user bids on job catagory
+        app.post('/my-selected-bids', async (req, res) => {
+            const myBids = req.body;
+            const result = await MyBidsCollection.insertOne(myBids);
+            res.send(result)
+        })
 
         // get posted data for showing in Brows by catagory
         app.get('/jobcatagory', async (req, res) => {
-            // const options = {
-            //     projection: {
-                    
-            //     },
-            // };
             const resuls = await JobCollection.find().toArray();
             res.send(resuls)
         })
+
+
+        // get data which user bids on job catagory
+         app.get('/my-selected-bids', async (req, res) => {
+             const resuls = await MyBidsCollection.find().toArray();
+             res.send(resuls)
+         })
+        
+
+
 
 
 
