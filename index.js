@@ -4,7 +4,8 @@ const cors = require('cors');
 const app = express();
 const {
     MongoClient,
-    ServerApiVersion
+    ServerApiVersion,
+    ObjectId
 } = require('mongodb');
 
 const port = process.env.PORT || 5001
@@ -57,11 +58,45 @@ async function run() {
 
 
         // get data which user bids on job catagory
-         app.get('/my-selected-bids', async (req, res) => {
-             const resuls = await MyBidsCollection.find().toArray();
-             res.send(resuls)
-         })
-        
+        app.get('/my-selected-bids', async (req, res) => {
+            const resuls = await MyBidsCollection.find().toArray();
+            res.send(resuls)
+        })
+
+
+        // put add job data like update data
+        app.put('/jobcatagory/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateInfo = req.body
+            // console.log(id,"update");
+            const filter = {
+                _id: new ObjectId(id)
+            };
+            // console.log(filter,"filter");
+            const options = {
+                upsert: true
+            };
+            const updateJobPost = {
+                $set: {
+                    jobtitle: updateInfo.jobtitle,
+                    deadline: updateInfo.deadline,
+                    minimumprcie: updateInfo.minimumprcie,
+                    maximumprice: updateInfo.maximumprice,
+                    description: updateInfo.description,
+                    catagory: updateInfo.catagory,
+                },
+            };
+            const result = await JobCollection.updateOne(filter, updateJobPost, options);
+            res.send(result)
+        })
+
+        // delete job posted data 
+        app.delete('/jobcatagory/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await JobCollection.deleteOne(query);
+            res.send(result);
+        })
 
 
 
